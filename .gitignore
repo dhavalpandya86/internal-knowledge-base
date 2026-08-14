@@ -1,0 +1,39 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# next.js
+/.next/
+/out/
+next-env.d.ts
+
+# production
+/build
+
+# env / secrets — NEVER commit these
+.env
+.env.local
+.env*.local
+
+# uploaded / collected data stays private and local
+/uploads/*
+!/uploads/.gitkeep
+
+# database
+*.sqlite
+*.db
+
+# prisma generated client
+/prisma/generated
+
+# logs & os
+npm-debug.log*
+yarn-error.log*
+.DS_Store
+Thumbs.db
+
+# editor
+.vscode/*
+!.vscode/extensions.json
+.idea

@@ -1,0 +1,96 @@
+// Internal Knowledge Base — data model.
+// All data lives in your own Postgres instance; uploaded files live on your disk.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  name        String
+  role        String // VP Product Enablement | CS Manager | CS & Training | RevOps
+  createdAt   DateTime @default(now())
+  articles    KbArticle[]
+  activities  Activity[]
+}
+
+// Support tickets synced from HubSpot (or mock source).
+model Ticket {
+  id           String   @id // HubSpot object id or seed id (e.g. TKT-2301)
+  source       String   @default("hubspot") // hubspot | mock | manual
+  category     String
+  company      String?
+  subject      String
+  body         String?
+  status       String   @default("open")
+  resolution   String?
+  createdAt    DateTime @default(now())
+  syncedAt     DateTime @default(now())
+  clusterId    String?
+  cluster      Cluster? @relation(fields: [clusterId], references: [id])
+}
+
+// A recurring pattern grouping several tickets.
+model Cluster {
+  id         String    @id @default(cuid())
+  title      String
+  category   String
+  rootCause  String?
+  frequency  Int       @default(0)
+  trend      String    @default("stable")
+  kbExists   Boolean   @default(false)
+  tickets    Ticket[]
+  articles   KbArticle[]
+  createdAt  DateTime  @default(now())
+}
+
+// AI-generated, human-approved knowledge base article.
+model KbArticle {
+  id          String   @id @default(cuid())
+  title       String
+  summary     String?
+  resolution  String
+  status      String   @default("draft") // draft | approved
+  approvedBy  String?
+  provider    String? // which AI provider generated it
+  clusterId   String?
+  cluster     Cluster? @relation(fields: [clusterId], references: [id])
+  authorId    String?
+  author      User?    @relation(fields: [authorId], references: [id])
+  createdAt   DateTime @default(now())
+}
+
+// Pre-written RFP question/answer pairs.
+model RfpEntry {
+  id        String   @id @default(cuid())
+  category  String
+  question  String
+  answer    String
+  createdAt DateTime @default(now())
+}
+
+// Files uploaded by the company (PDF / DOCX / MD / TXT).
+model Document {
+  id           String   @id @default(cuid())
+  filename     String
+  storagePath  String // path on local disk (never the raw file in DB)
+  mimeType     String
+  sizeBytes    Int
+  extractedText String? // parsed text for search / AI grounding
+  uploadedBy   String?
+  createdAt    DateTime @default(now())
+}
+
+model Activity {
+  id        String   @id @default(cuid())
+  action    String
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+}
