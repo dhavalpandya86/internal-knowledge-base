@@ -93,6 +93,13 @@ All settings live in `.env` (see [`.env.example`](.env.example)):
 | `GET/POST` | `/api/documents` | List / upload documents |
 | `GET` | `/api/health` | Config + status |
 
+## Status
+
+**Stage:** Prototype / scaffold · **As of:** 15 Nov 2026 · **Last commit:** 14 Aug 2026
+
+The self-hosted app, HubSpot pull, file ingestion and the three-provider AI proxy work. The UI
+still runs on seed state; wiring it to the database-backed APIs is the next step (see Roadmap).
+
 ## Roadmap
 
 - Wire the UI tabs to the DB-backed APIs (replace in-memory seed state).
